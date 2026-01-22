@@ -1,10 +1,33 @@
 import pandas as pd
 import re
 from pathlib import Path
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 DATA_PATH = Path("data/netflix_titles.csv")
 TEXT_COLS = ["listed_in", "director", "cast", "description"]
 
+def crear_perfil_textual(df: pd.DataFrame) -> pd.Series:
+    """
+    Combina las columnas textuales en un solo perfil por título
+    """
+    return (
+        df["listed_in"] + " " +
+        df["director"] + " " +
+        df["cast"] + " " +
+        df["description"]
+    )
+
+
+def calcular_similitud(perfiles: pd.Series):
+    """
+    Vectoriza los perfiles y calcula la similitud por coseno
+    """
+    vectorizer = CountVectorizer(stop_words="english")
+    matriz = vectorizer.fit_transform(perfiles)
+    similitud = cosine_similarity(matriz)
+    return similitud
 
 def limpiar_texto(texto: str) -> str:
      texto = texto.lower()
@@ -36,10 +59,17 @@ def cargar_dataset(ruta: Path) -> pd.DataFrame:
 
 def main():
         df = cargar_dataset(DATA_PATH)
+
+        perfiles = crear_perfil_textual(df)
+        similitud = calcular_similitud(perfiles)
+
         print("Dataset limpio y preparado")
         print(f"Filas: {len(df)} | Columnas: {len(df.columns)}")
         print(df[TEXT_COLS].head(3))
-
+        
+        print("Matriz de similitud creada")
+        print(f"Dimensiones: {similitud.shape}")
+        print(similitud[:2, :2])
         
 if __name__ == "__main__":
      main()
