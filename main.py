@@ -52,6 +52,7 @@ def cargar_dataset(ruta: Path) -> pd.DataFrame:
     
     print("Dataset cargado correctamente")
     df = pd.read_csv(ruta)
+    df.columns = df.columns.str.strip()
     print(f"Filas: {len(df)} | Columnas: {len(df.columns)}")
     print(df.columns.tolist())
     
