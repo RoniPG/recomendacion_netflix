@@ -82,30 +82,22 @@ def cargar_dataset(ruta: Path) -> pd.DataFrame:
     print("Dataset cargado correctamente")
     df = pd.read_csv(ruta)
     print(f"Filas: {len(df)} | Columnas: {len(df.columns)}")
-    print(df.columns.tolist())
 
     return limpiar_dataset(df)
 
 
-def main():
+def inicializar_sistema():
+    """
+    Inicializa el sistema cargando y preparando el dataset
+    """
     df = cargar_dataset(DATA_PATH)
-
     perfiles = crear_perfil_textual(df)
     similitud = calcular_similitud(perfiles)
-
-    print("Dataset limpio y preparado")
-    print(f"Filas: {len(df)} | Columnas: {len(df.columns)}")
-    print(df[TEXT_COLS].head(3))
-
-    print("Matriz de similitud creada")
-    print(f"Dimensiones: {similitud.shape}")
-    print(similitud[:2, :2])
-
-    recomendaciones = recomendar("Intrusion", df, similitud, top_n=5)
-
-    print("\nRecomendaciones:")
-    print(recomendaciones)
+    return df, similitud
 
 
 if __name__ == "__main__":
-    main()
+    df, similitud = inicializar_sistema()
+    recomendaciones = recomendar("Intrusion", df, similitud, top_n=5)
+    print("\nRecomendaciones:")
+    print(recomendaciones)
